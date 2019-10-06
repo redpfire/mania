@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  
+<!-- Mirrored from z80.ukl.me/webmania/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Oct 2019 06:31:23 GMT -->
+<head>
+    <meta charset="utf-8">
+    <title>Mania</title>
+    <link rel="stylesheet" href="assets/style.css" media="screen" title="Main stylesheet" charset="utf-8">
+  </head>
+  <!-- <body onload="main()"> -->
+  <body>
+    <div id="background_shadow"></div>
+    <div class='menu'>
+        <div class='menu bar'>
+            <span style='margin-left: 3rem;font-size: 50px;margin-top: 0.7rem;'>Select song</span>
+        </div>
+        <div class='menu songinfo'></div>
+        <div class='menu songs'></div>
+    </div>
+    <div id='pause'></div>
+    <canvas id="game_canvas" width="0" height="0" tabIndex="0">
+      Your browser does not support canvas.
+    </canvas>
+    <div id='tries_container'>
+        <span id='tries'></span>
+    </div>
+    <div id="acc_container" style='visibility: hidden;'>
+      <span id="acc" >100.00</span>%
+    </div>
+    <script src="assets/lodash.min.js" charset="utf-8"></script>
+    <script src="assets/async.min.js" charset="utf-8"></script>
+    <script src="assets/jszip.min.js" charset="utf-8"></script>
+    <!-- Don't worry, this'll get condensed to a single JS file for prod -->
+    <!--
+    <script src="game/util.js" charset="utf-8"></script>
+    <script src="game/webaudio.js" charset="utf-8"></script>
+    <script src="game/osuloader.js" charset="utf-8"></script>
+    <script src="game/skin.js" charset="utf-8"></script>
+    <script src="game/mania.js" charset="utf-8"></script>
+    <script src="game/renderer.js" charset="utf-8"></script>
+    <script src="game/input.js" charset="utf-8"></script>
+    <script src="game/main.js" charset="utf-8"></script>
+    -->
+    <script src="game/new.js" charset="utf-8"></script>
+  </body>
+
+<!-- Mirrored from z80.ukl.me/webmania/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 02 Oct 2019 06:31:28 GMT -->
+</html>
