@@ -91,7 +91,7 @@ class Mania {
 
     static keyStateAtTime(column, time, keys) {
         var kCol = keys[column];
-        var k = Util.binarySearchRange(kCol, false, function (x) { return x.time - 0; }, function (x) { return x.time - time; });
+        var k = Util.binarySearchRange(kCol, false, (x) => { return x.time - 0; }, (x) => { return x.time - time; });
         if (k === -1)
             return false;
         return kCol[k].state;
@@ -200,8 +200,8 @@ Mania.State = class {
     setNotes(notes) {
         this.notes = _.clone(notes);
         this.notesSortedByEndTime = _.clone(notes);
-        this.notes.sort(function (a, b) { return a.time - b.time; });
-        this.notesSortedByEndTime.sort(function (a, b) { return a.endTime - b.endTime; });
+        this.notes.sort((a, b) => { return a.time - b.time; });
+        this.notesSortedByEndTime.sort((a, b) => { return a.endTime - b.endTime; });
     }
 
     accuracyWithThreshold(threshold) {
@@ -355,19 +355,19 @@ class Osu {
 
     static readMap(contents, mapName, p) {
         var partial = p || false;
-        var lines = _.map(contents.split(/\r?\n/), function (ln) { return ln.trim(); });
+        var lines = _.map(contents.split(/\r?\n/), (ln) => { return ln.trim(); });
         function readSection(section) {
             var match = "[" + section + "]";
             return _(lines)
-                .dropWhile(function (x) { return x !== match; })
+                .dropWhile((x) => { return x !== match; })
                 .drop()
-                .takeWhile(function (x) { return x.charAt(0) !== "["; })
-                .filter(function (x) { return x.length > 0; })
+                .takeWhile((x) => { return x.charAt(0) !== "["; })
+                .filter((x) => { return x.length > 0; })
                 .value();
         }
         function findMatch(rgx, lns) {
-            return _(lns).map(function (x) { return x.match(rgx); })
-                .find(function (x) { return x !== null; });
+            return _(lns).map((x) => { return x.match(rgx); })
+                .find((x) => { return x !== null; });
         }
         function readSetting(setting) {
             var val = findMatch(new RegExp(setting + ":(.*)$"), lines);
