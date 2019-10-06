@@ -1241,6 +1241,8 @@ class GameManager {
         this._songsmenu = document.querySelector('.menu.songs');
         this._menu = document.querySelector('.menu');
         this.detect_songs();
+        this.preview = {};
+        this.preview.name = "";
     }
 
     _init(total) {
@@ -1266,10 +1268,11 @@ class GameManager {
                 var dir = a.slice(0,3).join('/');
                 var name = a[3];
                 this.hide_menu();
+                this._fadeout();
                 setTimeout(() => {this._new(dir,name);}, 600);
             }
         };
-        // 38 do góry; 40 w dół
+        this._songsmenu.focus();
     }
 
     hide_menu() {
@@ -1361,6 +1364,33 @@ class GameManager {
         else {
             this._songsmenu.scrollTo(0,0);
         }
+
+        if(this.preview.name !== diff.map.mapName) {
+            this.preview.name = diff.map.mapName;
+            if(this.preview.audio) {
+                this.preview.audio.pause();
+            }
+
+            this.preview.audio = new Audio();
+            this.preview.audio.autoplay = true;
+            //song.volume = 0.50;
+            this.preview.audio.volume = 0.90;
+            this.preview.audio.src = dir+"/"+diff.map.audioFilename;
+            this.preview.audio.currentTime = 30;
+        }
+    }
+
+    _fadeout() {
+        var fadeAudio = setInterval(() => {
+            if (this.preview.audio.volume != 0.0) {
+                this.preview.audio.volume -= 0.1;
+            }
+            if (this.preview.audio.volume === 0.0) {
+                clearInterval(fadeAudio);
+                this.preview.audio.pause();
+                this.preview.audio = null;
+            }
+        }, 90);
     }
 
     _deselect(id) {
