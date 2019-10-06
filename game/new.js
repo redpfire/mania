@@ -78,7 +78,8 @@ class Game {
         var acc = this.state.accuracy() * 100;
         if (acc !== this.lastAcc) {
             this.lastAcc = acc;
-            document.getElementById("acc").innerHTML = (this.state.accuracy() * 100).toFixed(2);
+            var cc = (this.state.accuracy() * 100).toFixed(2);
+            document.getElementById("acc").innerHTML = (isNaN(cc)) ? 0 : cc;
         }
     }
 }
