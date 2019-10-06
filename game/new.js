@@ -1382,10 +1382,11 @@ class GameManager {
 
     _fadeout() {
         var fadeAudio = setInterval(() => {
-            if (this.preview.audio.volume != 0.0) {
+            console.log(this.preview.audio.volume);
+            if (this.preview.audio.volume > 0.0) {
                 this.preview.audio.volume -= 0.1;
             }
-            if (this.preview.audio.volume === 0.0) {
+            if (this.preview.audio.volume <= 0.01) {
                 clearInterval(fadeAudio);
                 this.preview.audio.pause();
                 this.preview.audio = null;
