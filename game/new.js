@@ -15,6 +15,25 @@ class Input {
                     ['L'.charCodeAt(0), 3]
                 ];
                 break;
+            case 5:
+                bindingPairs = [
+                    ['S'.charCodeAt(0), 0],
+                    ['D'.charCodeAt(0), 1],
+                    [32, 3],
+                    ['K'.charCodeAt(0), 2],
+                    ['L'.charCodeAt(0), 3]
+                ];
+                break;
+            case 6:
+                bindingPairs = [
+                    [83, 0],
+                    [68, 1],
+                    [70, 2],
+                    [74, 4],
+                    [75, 5],
+                    [76, 6]
+                ];
+                break;
             case 7:
                 bindingPairs = [
                     [83, 0],
@@ -602,6 +621,10 @@ class GameRenderer2D extends GameRenderer {
         super();
         this.canvas = canvas;
     }
+
+    _set_skin(skin) {
+        this.skin = skin;
+    }
     
     init(skin) {
         this.canvas.style.visibility = '';
@@ -672,16 +695,16 @@ class GameRenderer2D extends GameRenderer {
             var hit = Mania.findHit(note.time, note.column, game.keys);
             if (hit && hit.time > t)
                 hit = null;
-            var color = hit ? Skin.keysLighter[column].hexString
-                : Skin.keys[column].hexString;
+            var color = hit ? this.skin.keysLighter[column].hexString
+                : this.skin.keys[column].hexString;
             if (note.sustain) {
                 var yTop = (y - note.sustainDuration / timePerPixel) | 0;
                 var sustainColor = void 0;
                 if (hit)
-                    sustainColor = keyStates[column] ? Skin.keysGradient[10][column].hexString
-                        : Skin.keys[column].hexString;
+                    sustainColor = keyStates[column] ? this.skin.keysGradient[10][column].hexString
+                        : this.skin.keys[column].hexString;
                 else
-                    sustainColor = Skin.keysSustain[column].hexString;
+                    sustainColor = this.skin.keysSustain[column].hexString;
                 this.renderSustain(x, y, yTop, color, sustainColor);
             }
             else {
@@ -691,6 +714,8 @@ class GameRenderer2D extends GameRenderer {
     }
 
     render(game, skin, loading) {
+        if(skin === null)
+            return;
         var numKeys = game.numKeys;
         var boardWidth = this.boardWidth;
         var boardHeight = this.boardHeight;
@@ -704,9 +729,9 @@ class GameRenderer2D extends GameRenderer {
         this.renderNotes(game);
         for (var i = 0; i < numKeys; i++) {
             var brightness = GameRenderer.keyBrightness(i, game);
-            var brightIndex = Math.min(brightness * Skin.keysGradient.length, Skin.keysGradient.length - 1) | 0;
-            var color = Skin.keysGradient[brightIndex][i].hexString;
-            var cap = Skin.keyCapsGradient[brightIndex][i].hexString;
+            var brightIndex = Math.min(brightness * skin.keysGradient.length, skin.keysGradient.length - 1) | 0;
+            var color = skin.keysGradient[brightIndex][i].hexString;
+            var cap = skin.keyCapsGradient[brightIndex][i].hexString;
             var x = keyWidth * i;
             var y = boardHeight - keyHeight;
             ctx.fillStyle = cap;
@@ -871,11 +896,35 @@ class SoundSet {
 }
 
 class Skin {
-    constructor() {
+    constructor(numKeys) {
         this.hitsounds = [];
+        if(numKeys == 4) {
+            this.keys = Skin.keys4k;
+        }
+        else if(numKeys == 5) {
+            this.keys = Skin.keys5k;
+        }
+        else if(numKeys == 6) {
+            this.keys = Skin.keys6k;
+        }
+        else {
+            this.keys = Skin.keys7k;
+        }
+        this.keysSustain = _.map(this.keys, (c) => { return c.scale(0.75); });
+        this.keysLighter = _.map(this.keys, (c) => { return c.scale(1.5); });
+        this.keysGradient = _.map(_.range(0.0, 1.01, 0.05), (s) => {
+            return _.map(_.zip(this.keys, this.keysLighter), (_a) => {
+                var x = _a[0], y = _a[1];
+                var r = y.r * s + x.r * (1.0 - s);
+                var g = y.g * s + x.g * (1.0 - s);
+                var b = y.b * s + x.b * (1.0 - s);
+                return new Color(r, g, b);
+            });
+        });
+        this.keyCapsGradient = _.map(this.keysGradient, (x) => { return _.map(x, (c) => { return c.scale(0.8); }); });
     }
 
-    static loadSkin(path, audioContext, cb) {
+    static loadSkin(path, numKeys, audioContext, cb) {
         Util.loadResources([
             { type: 1, path: "soft-hitclap.wav" },
             { type: 1, path: "soft-hitfinish.wav" },
@@ -889,7 +938,7 @@ class Skin {
             { type: 0, path: "mania-hit300.png" },
             { type: 0, path: "mania-hit300g.png" }
         ], audioContext, path, (res) => {
-            var skin = new Skin();
+            var skin = new Skin(numKeys);
             var soft = new SoundSet();
             soft.hitclap = res["soft-hitclap.wav"];
             soft.hitfinish = res["soft-hitfinish.wav"];
@@ -909,25 +958,39 @@ class Skin {
     }
 }
 
-Skin.keys = [
+Skin.keys7k = [
+    Color.fromRGB(0x6E2E8D),
+    Color.fromRGB(0x363B73),
+    Color.fromRGB(0x6E2E8D),
+    Color.fromRGB(0x8D842E),
+    Color.fromRGB(0x6E2E8D),
+    Color.fromRGB(0x363B73),
+    Color.fromRGB(0x6E2E8D),
+];
+
+Skin.keys6k = [
+    Color.fromRGB(0x6E2E8D),
+    Color.fromRGB(0x363B73),
+    Color.fromRGB(0x6E2E8D),
+    Color.fromRGB(0x363B73),
+    Color.fromRGB(0x6E2E8D),
+];
+
+Skin.keys5k = [
+    Color.fromRGB(0x6E2E8D),
+    Color.fromRGB(0x363B73),
+    Color.fromRGB(0x8D842E),
+    Color.fromRGB(0x363B73),
+    Color.fromRGB(0x6E2E8D),
+];
+
+Skin.keys4k = [
     Color.fromRGB(0x6E2E8D),
     Color.fromRGB(0x363B73),
     Color.fromRGB(0x363B73),
     Color.fromRGB(0x6E2E8D),
 ];
 
-Skin.keysSustain = _.map(Skin.keys, (c) => { return c.scale(0.75); });
-Skin.keysLighter = _.map(Skin.keys, (c) => { return c.scale(1.5); });
-Skin.keysGradient = _.map(_.range(0.0, 1.01, 0.05), (s) => {
-    return _.map(_.zip(Skin.keys, Skin.keysLighter), (_a) => {
-        var x = _a[0], y = _a[1];
-        var r = y.r * s + x.r * (1.0 - s);
-        var g = y.g * s + x.g * (1.0 - s);
-        var b = y.b * s + x.b * (1.0 - s);
-        return new Color(r, g, b);
-    });
-});
-Skin.keyCapsGradient = _.map(Skin.keysGradient, (x) => { return _.map(x, (c) => { return c.scale(0.8); }); });
 Skin.SOUNDS_SOFT = 0;
 
 class Timing {
@@ -1270,7 +1333,7 @@ class GameManager {
                 var name = a[3];
                 this.hide_menu();
                 this._fadeout();
-                setTimeout(() => {this._new(dir,name);}, 600);
+                setTimeout(() => {this._new(dir,name,diff.map.numKeys);}, 600);
             }
         };
         this._songsmenu.focus();
@@ -1318,7 +1381,6 @@ class GameManager {
         this.maps = maps;
         this.diffs = [];
         var len = 0;
-        console.log(maps.length);
         maps.forEach((mapL) => {
             mapL.maps.forEach((m) => {
                 var map = m.map;
@@ -1383,7 +1445,11 @@ class GameManager {
 
     _fadeout() {
         var fadeAudio = setInterval(() => {
-            console.log(this.preview.audio.volume);
+            if(this.preview.audio.volume === null) {
+                clearInterval(fadeAudio);
+                return;
+            }
+
             if (this.preview.audio.volume > 0.0) {
                 this.preview.audio.volume -= 0.1;
             }
@@ -1419,13 +1485,13 @@ class GameManager {
         this._gb = gb;
     }
 
-    _new(mapname, diff) {
-        this._gb = new GameManager.GameBoard(this, mapname, diff);
+    _new(mapname, diff, numKeys) {
+        this._gb = new GameManager.GameBoard(this, mapname, diff, numKeys);
         document.getElementById("tries").innerHTML = '';
     }
 
-    retry(mapname, diff) {
-        this._new(mapname, diff);
+    retry(mapname, diff, numKeys) {
+        this._new(mapname, diff, numKeys);
         this.tries++;
         if(this.tries > 0)
             document.getElementById("tries").innerHTML = this.tries;
@@ -1435,12 +1501,13 @@ class GameManager {
 var gm = new GameManager();
 
 GameManager.GameBoard = class {
-    constructor(_gm, mapname, diff) {
+    constructor(_gm, mapname, diff, numKeys) {
         this.canvas = document.getElementById("game_canvas");
         document.getElementById("acc_container").style.visibility = '';
         this.harness = new Timing.AudioHarness(this);
         this.harness.timeOffset = 5;
-        this.game = new Game(4, this.harness);
+        var numkeys = numKeys || 4;
+        this.game = new Game(numkeys, this.harness);
         this.skin = null;
         this.audio = new GameAudio();
         this.renderer = new GameRenderer2D(this.canvas);
@@ -1454,13 +1521,18 @@ GameManager.GameBoard = class {
             if(k == 27) // esc
                 this.pause();
 
+            if(k == 'Q'.charCodeAt(0) && this.harness._paused) {
+                this._unpause();
+                setTimeout(() => {this.stop();}, 200);
+            }
+
             if(this.harness._paused)
                 return;
 
             if(k == 192) // gravetick
             {
                 this._stop();
-                _gm.retry(mapname, diff);
+                _gm.retry(mapname, diff, numkeys);
                 return;
             }
 
@@ -1488,8 +1560,9 @@ GameManager.GameBoard = class {
 
         async.waterfall([
             (cb) => {
-                Skin.loadSkin("assets/aesthetic", this.audio.ctx, (sk) => {
+                Skin.loadSkin("assets/aesthetic", numkeys, this.audio.ctx, (sk) => {
                     this.skin = sk;
+                    this.renderer._set_skin(sk);
                     console.log("Loaded skin");
                     cb(null);
                 });
@@ -1563,11 +1636,18 @@ GameManager.GameBoard = class {
    }
 
     stop() {
-        this._stop();
         this.renderer.canvas.style.visibility = 'hidden';
         document.getElementById("acc_container").style.visibility = 'hidden';
         document.body.style.background = "";
-        this._gm._set_gb(null);
+        this._stop();
+        setTimeout(() => {this._gm._set_gb(null);}, 500);
+    }
+
+    _unpause() {
+        if(this.harness._paused) {
+            document.getElementById("pause").style.visibility = '';
+            setTimeout(() => {document.getElementById("acc_container").style.color = '#fff';}, 1000);
+        }
     }
 
     pause() {
