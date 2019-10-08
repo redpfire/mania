@@ -98,8 +98,13 @@ div.menu.bar {
 div.menu.songinfo {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     width: 50%;
-    height: 100%;
+    height: calc(100% - 5rem);
+    margin-top: auto;
+    scroll-behavior: smooth;
+    overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 div.menu.songs {
